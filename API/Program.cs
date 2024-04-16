@@ -1,6 +1,7 @@
 using System.Text;
 using API;
 using API.Data;
+using API.Extensions;
 using API.Interfaces;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,25 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-// Pradyumna 20240404: Start
-builder.Services.AddScoped<ITokenService, TokenService>(); // Added custom built service to creating user tokens
-builder.Services.AddCors();
-builder.Services.AddDbContext<DataContext>(opt => 
-{
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-// Added for enabling Authentication in the app, which helps the [Authorize] attributes in Controller classes
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options => 
-    {
-        options.TokenValidationParameters = new TokenValidationParameters{
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = false,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"])),
-            ValidateAudience = false
-        };
-    });
-// Pradyumna 20240404: End
+builder.Services.AddApplicationServices(builder.Configuration); // Prady - Calling code from custom built Extension method
+builder.Services.AddIdentityServices(builder.Configuration); // Prady - Calling code from custom built Extension method
 // // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 // builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
