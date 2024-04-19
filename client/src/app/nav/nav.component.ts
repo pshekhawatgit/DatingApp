@@ -12,6 +12,18 @@ export class NavComponent {
 
   constructor(private accountService: AccountService){}
   
+  ngOnInit(): void{
+    this.getCurrentUser();
+  }
+
+  // Method to check if User is already logged in, Using Observable I created
+  getCurrentUser(){
+    this.accountService.currentUser$.subscribe({
+      next: user => this.loggedIn = !!user, // !! operator makes it boolean and return true is value present, and false if not 
+      error: error => console.log(error)
+    })
+  }
+
   login() {
     this.accountService.login(this.model).subscribe({
       next: response => {
@@ -23,6 +35,7 @@ export class NavComponent {
   }
 
   logout(){
+    this.accountService.logout();
     this.loggedIn = false;
   }
 }
