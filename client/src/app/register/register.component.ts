@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-register',
@@ -6,6 +6,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  @Input() usersFromHomeComponent: any; // for parent to chile communication
+  @Output() cancelRegister = new EventEmitter(); // for Child to parent communication
   model:any={}
 
   register(){
@@ -13,6 +15,6 @@ export class RegisterComponent {
   }
 
   cancel(){
-    console.log("Cancelled");
+    this.cancelRegister.emit(false);
   }
 }
