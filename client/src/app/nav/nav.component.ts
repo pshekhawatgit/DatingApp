@@ -3,6 +3,7 @@ import { AccountService } from '../_services/account.service';
 import { Observable, of } from 'rxjs';
 import { User } from '../_models/user';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-nav',
@@ -12,7 +13,7 @@ import { Router } from '@angular/router';
 export class NavComponent {
   model: any = {}
 
-  constructor(public accountService: AccountService, private router: Router){} // Made public for accessing in html
+  constructor(public accountService: AccountService, private router: Router, private toastr: ToastrService){} // Made public for accessing in html
   
   ngOnInit(): void{
   }
@@ -20,7 +21,7 @@ export class NavComponent {
   login() {
     this.accountService.login(this.model).subscribe({
       next: _ => this.router.navigateByUrl('/members'), // Instead of _ you can also use ()
-      error: error => console.log(error)
+      error: error => this.toastr.error(error.error)
   })
   }
 
