@@ -15,13 +15,13 @@ public class BuggyController : BaseApiController
     }
 
      [Authorize]
-     [HttpGet("auth")]
+     [HttpGet("auth")] // 401
      public ActionResult<string> GetSecret()
      {
         return "some secret text";
      }
 
-     [HttpGet("server-error")]
+     [HttpGet("server-error")] // 500
      public ActionResult<string> GetServerError()
      {
         var thing = _context.Users.Find(-1);
@@ -31,7 +31,7 @@ public class BuggyController : BaseApiController
         return returnVal;
      }
 
-     [HttpGet("not-found")]
+     [HttpGet("not-found")] // 404
      public ActionResult<AppUser> GetNotFound()
      {
         var thing = _context.Users.Find(-1);
@@ -41,7 +41,7 @@ public class BuggyController : BaseApiController
         return thing;
      }
 
-    [HttpGet("bad-request")]
+    [HttpGet("bad-request")] // 400
      public ActionResult<string> GetBadRequest()
      {
         return BadRequest("This is a Bad Request.");
