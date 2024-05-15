@@ -17,6 +17,7 @@ public static class ApplicationServiceExtensions
             opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
         });
         services.AddScoped<ITokenService, TokenService>(); // Added custom built service to creating user tokens
+        services.AddScoped<IUserRepository, UserRepository>(); // Added to implement repository pattern, to inject repository layer in Controller Layer
 
         return services;
     }
