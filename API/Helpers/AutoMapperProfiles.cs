@@ -12,7 +12,9 @@ public class AutoMapperProfiles : Profile // This is a class from AutoMapper nug
     public AutoMapperProfiles()
     {
         //CreateMap<SOURCE, DESTINATION>();
-        CreateMap<AppUser, MemberDto>();
+        CreateMap<AppUser, MemberDto>()
+        .ForMember(dest => dest.PhotoUrl, 
+            opt => opt.MapFrom(src => src.Photos.FirstOrDefault(pic => pic.IsMain).Url));
         CreateMap<Photo, PhotoDto>();
     }
 }
