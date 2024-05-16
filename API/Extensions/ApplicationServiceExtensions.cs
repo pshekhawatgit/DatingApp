@@ -18,6 +18,7 @@ public static class ApplicationServiceExtensions
         });
         services.AddScoped<ITokenService, TokenService>(); // Added custom built service to creating user tokens
         services.AddScoped<IUserRepository, UserRepository>(); // Added to implement repository pattern, to inject repository layer in Controller Layer
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); // To inject AutoMapper service into Controllers
 
         return services;
     }
