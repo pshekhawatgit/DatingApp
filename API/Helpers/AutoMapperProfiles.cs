@@ -1,5 +1,6 @@
 ﻿using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using AutoMapper;
 
 namespace API.Helpers;
@@ -14,7 +15,8 @@ public class AutoMapperProfiles : Profile // This is a class from AutoMapper nug
         //CreateMap<SOURCE, DESTINATION>();
         CreateMap<AppUser, MemberDto>()
         .ForMember(dest => dest.PhotoUrl, 
-            opt => opt.MapFrom(src => src.Photos.FirstOrDefault(pic => pic.IsMain).Url));
+            opt => opt.MapFrom(src => src.Photos.FirstOrDefault(pic => pic.IsMain).Url))
+        .ForMember(dest => dest.Age, opt => opt.MapFrom(src => src.DateOfBirth.CalculateAge()));
         CreateMap<Photo, PhotoDto>();
     }
 }

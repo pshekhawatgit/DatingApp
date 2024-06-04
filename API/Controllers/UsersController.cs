@@ -26,11 +26,9 @@ public class UsersController : BaseApiController
     [HttpGet] // https://api/users
     public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
     {
-        IEnumerable<AppUser> users = await _userRepository.GetUsersAsync();
+        IEnumerable<MemberDto> users = await _userRepository.GetMembersAsync();
         
-        IEnumerable<MemberDto> usersToReturn = _mapper.Map<IEnumerable<MemberDto>>(users);
-
-        return Ok(usersToReturn);
+        return Ok(users);
 
     }
 
@@ -43,8 +41,6 @@ public class UsersController : BaseApiController
     [HttpGet("{username}")] // https://api/users/username
     public async Task<ActionResult<MemberDto>> GetUser(string username)
     {
-        AppUser user = await _userRepository.GetUserbyNameAsync(username);
-        
-        return _mapper.Map<MemberDto>(user);
+       return await _userRepository.GetMemberAsync(username);
     }
 }
