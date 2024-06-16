@@ -9,6 +9,7 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
+    //"strictPropertyInitialization": false, // Added to Not force the initialization while declaring a object/property
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
