@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map } from 'rxjs';
 import { User } from '../_models/user';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  baseUrl = 'https://localhost:5001/api/';
+  baseUrl = environment.apiUrl;
   // Start - Code to Create an Observable, so that other components in App can know that user is logged in or not.
   private currentUserSource = new BehaviorSubject<User | null>(null); // | null is used to tell it can also be null (when application starts and there is no user info)
   currentUser$ = this.currentUserSource.asObservable(); // $ signifies that is is an observable
