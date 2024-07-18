@@ -20,6 +20,7 @@ import { ServerErrorComponent } from './errors/server-error/server-error.compone
 import { MemberCardComponent } from './members/member-card/member-card.component';
 import { JwtInterceptor } from './_interceptors/jwt.interceptor';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
+import { LoadingInterceptor } from './_interceptors/loading.interceptor';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { MemberEditComponent } from './members/member-edit/member-edit.component
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }, // Multi was set to true bcuz we don't want to replace any Andgular default interceptors
-    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true } // Added to send JWT Authorization through interceptor
+    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }, // Added to send JWT Authorization through interceptor
+    {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true} // Added to show Loading spinner in case of delays while loading
   ],
   bootstrap: [AppComponent]
 })
