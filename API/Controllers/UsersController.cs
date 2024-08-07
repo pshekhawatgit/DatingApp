@@ -94,4 +94,38 @@ public class UsersController : BaseApiController
         
         return BadRequest("Problems adding photo");
     }
+
+    [HttpPut("set-main-photo/{photoId}")]
+
+    public async Task<ActionResult> SetMainPhoto(int photoId)
+    {
+        // Get current user
+        var user = await _userRepository.GetUserbyNameAsync(User.GetUsername());
+
+        if(user == null)
+            return NotFound();
+
+        // Get selected photo of current user
+        var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+
+        if(photo == null)
+            return NotFound();
+        
+        // Check if Photo is already main
+        if(photo.IsMain)
+            return BadRequest("This is already your main photo");
+
+        // Set current main photo as Not main and Selected photo as main
+        var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
+
+        if(currentMain != null)
+            currentMain.IsMain = false;
+        photo.IsMain = true;
+
+        // Save changes to DB using Entity framework, return Nothing if saved
+        if(await _userRepository.SaveAllAsync())
+            return NoContent();
+        // Else - return bad request
+        return BadRequest("Problem setting the main photo");
+    }
 }
