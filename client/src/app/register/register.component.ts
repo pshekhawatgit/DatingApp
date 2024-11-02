@@ -12,6 +12,7 @@ export class RegisterComponent {
   @Output() cancelRegister = new EventEmitter(); // for Child to parent communication
   model:any={}
   registerForm : FormGroup = new FormGroup({});
+  maxDate: Date = new Date();
 
   constructor(private accountService: AccountService, private toast: ToastrService, 
     private fb: FormBuilder
@@ -19,6 +20,7 @@ export class RegisterComponent {
 
   ngOnInit(): void{
     this.initializeForm();
+    this.maxDate.setFullYear(this.maxDate.getFullYear() - 18)
   }
 
   initializeForm() {
