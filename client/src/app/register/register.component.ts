@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AccountService } from '../_services/account.service';
 import { ToastrService } from 'ngx-toastr';
 import { AbstractControl, ControlContainer, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -10,13 +11,12 @@ import { AbstractControl, ControlContainer, FormBuilder, FormControl, FormGroup,
 })
 export class RegisterComponent {
   @Output() cancelRegister = new EventEmitter(); // for Child to parent communication
-  model:any={}
   registerForm : FormGroup = new FormGroup({});
   maxDate: Date = new Date();
+  validationErrors: string[] | undefined;
 
   constructor(private accountService: AccountService, private toast: ToastrService, 
-    private fb: FormBuilder
-  ){}
+    private fb: FormBuilder, private router: Router) {}
 
   ngOnInit(): void{
     this.initializeForm();
@@ -48,20 +48,29 @@ export class RegisterComponent {
   }
 
   register(){
-    console.log(this.registerForm?.value)
-
-    // this.accountService.register(this.model).subscribe({
-    //   next: () => {
-    //     this.cancel();
-    //   },
-    //   error: error => {
-    //     this.toast.error(error.error);
-    //     console.log(error);
-    //   }
-    // })
+    const dob = this.getDateOnly(this.registerForm.controls['dateOfBirth'].value);
+    const values = {... this.registerForm.value, dateOfBirth: dob};
+    this.accountService.register(values).subscribe({
+      next: () => {
+        this.router.navigateByUrl('/members')
+      },
+      error: error => {
+        this.validationErrors = error
+      }
+    })
   }
 
   cancel(){
     this.cancelRegister.emit(false);
+  }
+
+  // Method to get the date only and ignore the time information from date of birth
+  private getDateOnly(dob: string | undefined){
+    if(!dob)
+      return;
+
+    let dateOnly = new Date(dob);
+    return new Date(dateOnly.setMinutes(dateOnly.getMinutes() - dateOnly.getTimezoneOffset()))
+      .toISOString().slice(0,10);
   }
 }
