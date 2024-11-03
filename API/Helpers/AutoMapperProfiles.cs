@@ -19,5 +19,6 @@ public class AutoMapperProfiles : Profile // This is a class from AutoMapper nug
         .ForMember(dest => dest.Age, opt => opt.MapFrom(src => src.DateOfBirth.CalculateAge()));
         CreateMap<Photo, PhotoDto>();
         CreateMap<MemberUpdateDto, AppUser>();
+        CreateMap<RegisterDto, AppUser>();
     }
 }
