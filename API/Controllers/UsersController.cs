@@ -33,6 +33,14 @@ public class UsersController : BaseApiController
     [HttpGet] // https://api/users
     public async Task<ActionResult<PagedList<MemberDto>>> GetUsers([FromQuery]UserParams userParams)
     {
+        var currentUser = await _userRepository.GetUserbyNameAsync(User.GetUsername());
+        userParams.CurrentUsername = currentUser.UserName;
+        // Set opposite gender in filtering, as default when no filter/params is selected
+        if(String.IsNullOrEmpty(userParams.Gender))
+        {
+            userParams.Gender = currentUser.Gender == "male" ? "female" : "male";
+        }
+
         PagedList<MemberDto> users = await _userRepository.GetMembersAsync(userParams);
         
         Response.AddPaginationHeader(new PaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages));

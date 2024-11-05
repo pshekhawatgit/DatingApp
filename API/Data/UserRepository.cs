@@ -24,11 +24,14 @@ public class UserRepository : IUserRepository
 
     public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
     {
-        var query = _context.Users
-            .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
-            .AsNoTracking();
+        var query = _context.Users.AsQueryable();
+        // Exclude logged in user
+        query = query.Where(u => u.UserName != userParams.CurrentUsername);
+        // Set default gender filter
+        query = query.Where(u => u.Gender == userParams.Gender);
 
-        return await PagedList<MemberDto>.CreateAsync(query, userParams.pageNumber, userParams.PageSize);
+        return await PagedList<MemberDto>.CreateAsync(query.ProjectTo<MemberDto>(_mapper.ConfigurationProvider).AsNoTracking(), 
+        userParams.pageNumber, userParams.PageSize);
     }
 
     public async Task<MemberDto> GetMemberAsync(string username)
