@@ -5,6 +5,7 @@ import { Member } from '../_models/member';
 import { map, observeOn, of } from 'rxjs';
 import { Photo } from '../_models/photo';
 import { PaginatedResult } from '../_models/pagination';
+import { UserParams } from '../_models/userParams';
 
 @Injectable({
   providedIn: 'root'
@@ -12,34 +13,45 @@ import { PaginatedResult } from '../_models/pagination';
 export class MembersService {
   members: Member[] = [];
   baseUrl = environment.apiUrl;
-  paginatedResult: PaginatedResult<Member[]> = new PaginatedResult<Member[]>;
 
   constructor(private http: HttpClient) { }
 
-  getMembers(page?: number, itemsPerPage?: number) {
-    let params = new HttpParams();
+  getMembers(userParams: UserParams) {
+    let params = this.getPaginationHeaders(userParams);
 
-    if(page && itemsPerPage)
-    {
-      params = params.append('pageNumber', page);
-      params = params.append('pageSize', itemsPerPage);
-    }
+    params = params.append('minAge', userParams.minAge);
+    params = params.append('maxAge', userParams.maxAge);
+    params = params.append('gender', userParams.gender);
+    
+    return this.getPaginatedResult<Member[]>(this.baseUrl + 'users', params)
+  }
 
-    return this.http.get<Member[]>(this.baseUrl + 'users', {observe: 'response', params}).pipe(
+  private getPaginatedResult<T>(url: string, params: HttpParams) {
+    const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>;
+    return this.http.get<T>(url, { observe: 'response', params }).pipe(
       map(response => {
-        if(response.body){
-          this.paginatedResult.result = response.body;
+        if (response.body) {
+          paginatedResult.result = response.body;
         }
         // Pagination header is coming from API as we added this line of code in HTTPExtension.cs class
         // response.Headers.Append("Access-Control-Expose-Headers", "Pagination")
         const pagination = response.headers.get('Pagination');
-        if(pagination){
-          this.paginatedResult.pagination = JSON.parse(pagination);
+        if (pagination) {
+          paginatedResult.pagination = JSON.parse(pagination);
         }
 
-        return this.paginatedResult;
+        return paginatedResult;
       })
-    )
+    );
+  }
+
+  private getPaginationHeaders(userParams: UserParams) {
+    let params = new HttpParams();
+
+    params = params.append('pageNumber', userParams.pageNumber);
+    params = params.append('pageSize', userParams.pageSize);
+    
+    return params;
   }
 
   getMember(username: string) {
