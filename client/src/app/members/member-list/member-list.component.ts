@@ -12,7 +12,7 @@ import { MembersService } from 'src/app/_services/members.service';
 export class MemberListComponent {
   members: Member[] = [];
   pagination: Pagination | undefined;
-  pageNumber = 2; // Hard coded
+  pageNumber = 1; // Hard coded
   pageSize = 5; // Hard coded
 
   constructor(private memberService: MembersService) {}
@@ -31,5 +31,13 @@ export class MemberListComponent {
         }
       }
     })
+  }
+
+  pageChanged(event: any)
+  {
+    if(this.pageNumber !== event.page){
+      this.pageNumber = event.page;
+      this.loadmembers();
+    }
   }
 }
