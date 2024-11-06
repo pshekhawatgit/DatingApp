@@ -1,3 +1,4 @@
+import { useAnimation } from '@angular/animations';
 import { Component } from '@angular/core';
 import { Observable, take } from 'rxjs';
 import { Member } from 'src/app/_models/member';
@@ -17,6 +18,7 @@ export class MemberListComponent {
   pagination: Pagination | undefined;
   userParams: UserParams | undefined;
   user: User | undefined;
+  genderList = [{value: 'male', display: 'Males'}, {value: 'female', display: 'Females'}];
 
   constructor(private memberService: MembersService, private accoutService: AccountService) {
     this.accoutService.currentUser$.pipe(take(1)).subscribe({
@@ -46,6 +48,14 @@ export class MemberListComponent {
         }
       }
     })
+  }
+
+  resetFilters(){
+    if(this.user)
+    {
+      this.userParams = new UserParams(this.user);
+      this.loadmembers();
+    }
   }
 
   pageChanged(event: any)
