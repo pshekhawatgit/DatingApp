@@ -17,12 +17,12 @@ public class LogUserActivity : IAsyncActionFilter
             return;
 
         // Get Username from Httpcontext (System.Security.Claims.ClaimsPrincipal)
-        var username = resultContext.HttpContext.User.GetUsername();
+        var userId = resultContext.HttpContext.User.GetUserId();
         // Get UserRepository service to make change to User in DB
         var repo = resultContext.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
 
         //Get User Entity
-        var user = await repo.GetUserbyNameAsync(username);
+        var user = await repo.GetUserByIdAsync(userId);
         // Set Last Active date
         user.LastActive = DateTime.UtcNow;
         // Save it in DB

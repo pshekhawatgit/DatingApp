@@ -19,7 +19,8 @@ public class TokenService : ITokenService
     {
         // Create Claims list that a User may have in a request
         var claims = new List<Claim>{
-            new Claim(JwtRegisteredClaimNames.NameId, user.UserName)
+            new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
         };
 
         // Create Credentials by encripting the key
