@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
 import { TabsModule } from 'ngx-bootstrap/tabs';
+import { TimeagoModule } from 'ngx-timeago';
 import { Member } from 'src/app/_models/member';
 import { MembersService } from 'src/app/_services/members.service';
 
@@ -11,7 +12,7 @@ import { MembersService } from 'src/app/_services/members.service';
   standalone: true, // Made standalone to utilize a Standalone component (ngx-gallery) for Photos
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.css'],
-  imports: [CommonModule, TabsModule, GalleryModule] // Had to import explicitly as it is now a standalone module
+  imports: [CommonModule, TabsModule, GalleryModule, TimeagoModule] // Had to import explicitly as it is now a standalone module
 })
 export class MemberDetailComponent implements OnInit{
   member: Member | undefined;
