@@ -24,6 +24,7 @@ public static class ApplicationServiceExtensions
         services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings")); // Added to pull Cloudinary (3rd Party API for Images) settings from AppSettings.JSON
         services.AddScoped<IPhotoService, PhotoService>(); // Added service to Add/Delete photos using Cloudinary
         services.AddScoped<LogUserActivity>(); // Added Service to save LastActive datetime of a user 
+        services.AddScoped<ILikesRepository, LikesRepository>(); // added to implement Likes functionality
 
         return services;
     }
