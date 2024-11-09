@@ -20,9 +20,7 @@ export class ListsComponent {
   }
 
   ngOnInit() : void {
-    console.log(this.predicate + ' start Init');
     this.loadLikes(); 
-    console.log(this.predicate + ' end Init');
   }
 
   loadLikes(){
@@ -30,7 +28,6 @@ export class ListsComponent {
       next: response => {
         this.members = response.result;
         this.pagination = response.pagination;
-        console.log(this.predicate + ' from Load Likes');
       }
     })
   }
