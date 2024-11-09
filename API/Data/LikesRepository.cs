@@ -66,9 +66,9 @@ public class LikesRepository : ILikesRepository
 
     /// <summary>
     /// Gets the Loggedin User from Likes table
-    /// Used when getting the user from Likes table to get all the users this user likes 
+    /// Used when getting the user from Likes table, to get all the users liked by this user 
     /// </summary>
-    /// <param name="userId"></param>
+    /// <param name="userId">User Id</param>
     /// <returns>User</returns>
     public async Task<AppUser> GetUserWithLikes(int userId)
     {
