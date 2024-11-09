@@ -2,6 +2,7 @@ using System;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,31 +35,33 @@ public class LikesRepository : ILikesRepository
     /// <param name="predicate">predicate to specify either the Liked Users or LikedBy Users are to be returned</param>
     /// <param name="userId">User Id of logged in user</param>
     /// <returns></returns>
-    public async Task<IEnumerable<LikeDto>> GetUserLikes(string predicate, int userId)
+    public async Task<PagedList<LikeDto>> GetUserLikes(LikesParams likesParams)
     {
         var users = _context.Users.OrderBy(u => u.UserName).AsQueryable();
         var likes = _context.Likes.AsQueryable();
 
-        if(predicate == "liked")
+        if(likesParams.Predicate == "liked")
         {
-            likes = likes.Where(l => l.SourceUserId == userId);
+            likes = likes.Where(l => l.SourceUserId == likesParams.UserId);
             users = likes.Select(l => l.TargetUser);
         }
 
-        if(predicate == "likedBy")
+        if(likesParams.Predicate == "likedBy")
         {
-            likes = likes.Where(l => l.TargetUserId == userId);
+            likes = likes.Where(l => l.TargetUserId == likesParams.UserId);
             users = likes.Select(l => l.SourceUser);
         }
 
-        return await users.Select(user => new LikeDto{
+        var likedUsers = users.Select(user => new LikeDto{
             UserName = user.UserName,
             KnownAs = user.KnownAs,
             Age = user.DateOfBirth.CalculateAge(),
             PhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain).Url,
             City = user.City,
             Id = user.Id
-        }).ToListAsync();
+        });
+
+        return await PagedList<LikeDto>.CreateAsync(likedUsers, likesParams.pageNumber, likesParams.PageSize);
     }
 
     /// <summary>
