@@ -21,4 +21,8 @@ export class MessageService {
     // Call API (using GetPaginatedResult - Helper method) and return the response (of type Message[])
     return getPaginatedResult<Message[]>(this.baseUrl + 'messages', params, this.http);
   }
+
+  getMessageThread(userName: string){
+    return this.http.get<Message[]>(this.baseUrl + 'messages/thread/'+ userName);
+  }
 }
