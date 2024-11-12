@@ -1,12 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
-import { TabsModule } from 'ngx-bootstrap/tabs';
+import { TabDirective, TabsetComponent, TabsModule } from 'ngx-bootstrap/tabs';
 import { TimeagoModule } from 'ngx-timeago';
 import { Member } from 'src/app/_models/member';
 import { MembersService } from 'src/app/_services/members.service';
 import { MemberMessagesComponent } from '../member-messages/member-messages.component';
+import { Message } from 'src/app/_models/message';
+import { MessageService } from 'src/app/_services/message.service';
 
 @Component({
   selector: 'app-member-detail',
@@ -16,13 +18,31 @@ import { MemberMessagesComponent } from '../member-messages/member-messages.comp
   imports: [CommonModule, TabsModule, GalleryModule, TimeagoModule, MemberMessagesComponent] // Had to import explicitly as it is now a standalone module
 })
 export class MemberDetailComponent implements OnInit{
+  @ViewChild('memberTabs') memberTabs?: TabsetComponent; // To get hold of MemberTabs inside this component
   member: Member | undefined;
   images: GalleryItem[] = [];
+  activeTab?: TabDirective;
+  messages: Message[] = [];
 
-  constructor(private memberService: MembersService, private route: ActivatedRoute) {
+  constructor(private memberService: MembersService, private route: ActivatedRoute, private messageService: MessageService) {
   }
   ngOnInit(): void {
     this.loadmember();
+  }
+
+  onTabActivated(data: TabDirective){
+    this.activeTab = data;
+    if(this.activeTab.heading === data.heading){
+      this.loadMessages();
+    }
+
+  }
+
+  loadMessages(){
+    if(this.member)
+      this.messageService.getMessageThread(this.member.userName).subscribe({
+        next: messages => this.messages = messages
+      })
   }
 
   loadmember()
