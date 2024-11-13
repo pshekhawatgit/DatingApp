@@ -25,4 +25,9 @@ export class MessageService {
   getMessageThread(userName: string){
     return this.http.get<Message[]>(this.baseUrl + 'messages/thread/'+ userName);
   }
+
+  sendMessage(username: string, content: string){
+    return this.http.post<Message>(this.baseUrl + 'messages', 
+      {recipientUsername: username, content});
+  }
 }
