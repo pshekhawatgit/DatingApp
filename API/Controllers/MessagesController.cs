@@ -85,7 +85,7 @@ namespace API.Controllers
             var message = await _messageRepository.GetMessage(id);
             // Check if User is neither the sender nor receiver of this message
             if(message.SenderUserName != username && message.RecipientUserName != username)
-                Unauthorized();
+                return Unauthorized();
 
             // check if message is getting deleted by Sender or receiver 
             if(message.SenderUserName == username)
@@ -100,6 +100,8 @@ namespace API.Controllers
             // save changes to DB
             if(await _messageRepository.SaveAllAsync())
                 return Ok();
+
+            return BadRequest("Problem deleting the message");
         }
     }
 }
