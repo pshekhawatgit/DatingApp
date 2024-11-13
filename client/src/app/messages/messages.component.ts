@@ -34,6 +34,14 @@ export class MessagesComponent {
     })
   }
 
+  deleteMessage(messageId: number){
+    this.messageService.deleteMessage(messageId).subscribe({
+      next: () => {
+        this.messages?.splice(this.messages.findIndex(m => m.id === messageId), 1)
+      }
+    })
+  }
+
   pageChanged(event: any)
   {
     if(this.pageNumber !== event.page){
