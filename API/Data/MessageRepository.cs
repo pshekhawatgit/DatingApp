@@ -41,9 +41,12 @@ public class MessageRepository : IMessageRepository
         // Filter based on the selected Container (Inbox / Outbox / Unread (default))
         query = messageParams.Container switch 
         {
-            "Inbox" => query.Where(u => u.RecipientUserName == messageParams.UserName),
-            "Outbox" => query.Where(u => u.SenderUserName == messageParams.UserName),
-            _ => query.Where(u => u.RecipientUserName == messageParams.UserName 
+            "Inbox" => query.Where(u => 
+                u.RecipientUserName == messageParams.UserName && u.RecipientDeleted == false),
+            "Outbox" => query.Where(u => 
+                u.SenderUserName == messageParams.UserName && u.SenderDeleted == false),
+            _ => query.Where(u => 
+                u.RecipientUserName == messageParams.UserName && u.RecipientDeleted == false 
                 && u.DateRead == null)
         };
 
@@ -60,8 +63,8 @@ public class MessageRepository : IMessageRepository
             .Include(u => u.Sender).ThenInclude(s => s.Photos)
             .Include(u => u.Recipient).ThenInclude(r => r.Photos)
             .Where(m => 
-                (m.SenderUserName == currentUserName && m.RecipientUserName == recipientUserName) 
-                || (m.RecipientUserName == currentUserName && m.SenderUserName == recipientUserName))
+                (m.SenderUserName == currentUserName && m.RecipientUserName == recipientUserName && m.SenderDeleted == false) 
+                || (m.RecipientUserName == currentUserName && m.SenderUserName == recipientUserName && m.RecipientDeleted == false))
             .OrderBy(m => m.MessageSent)
             .ToListAsync();
         // Get Unread messages
