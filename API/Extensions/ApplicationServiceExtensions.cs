@@ -25,6 +25,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IPhotoService, PhotoService>(); // Added service to Add/Delete photos using Cloudinary
         services.AddScoped<LogUserActivity>(); // Added Service to save LastActive datetime of a user 
         services.AddScoped<ILikesRepository, LikesRepository>(); // added to implement Likes functionality
+        services.AddScoped<IMessageRepository, MessageRepository>(); // added to implement Messages functionality
 
         return services;
     }
