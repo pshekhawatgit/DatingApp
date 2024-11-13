@@ -37,8 +37,6 @@ public class AccountController: BaseApiController
         using var hmac = new HMACSHA512();
 
         user.UserName = registerDto.UserName.ToLower();
-        user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
-        user.PasswordSalt = hmac.Key;
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -60,18 +58,6 @@ public class AccountController: BaseApiController
 
         if(user == null)
             return Unauthorized("invalid username");
-
-        // Use the Matching User's Password Salt from Database to create HMAC obj
-        using var hmac = new HMACSHA512(user.PasswordSalt);
-        // Get Hash of the Password from Login Screen
-        var computedhash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
-
-        // Compare both Hash byte arrays
-        for(int i=0; i< computedhash.Length; i++)
-        {
-            if(computedhash[i] != user.PasswordHash[i])
-                return Unauthorized("invalid password");
-        }
 
         return new UserDto{
             Username = user.UserName,
