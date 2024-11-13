@@ -18,8 +18,10 @@ import { MessageService } from 'src/app/_services/message.service';
   imports: [CommonModule, TabsModule, GalleryModule, TimeagoModule, MemberMessagesComponent] // Had to import explicitly as it is now a standalone module
 })
 export class MemberDetailComponent implements OnInit{
-  @ViewChild('memberTabs') memberTabs?: TabsetComponent; // To get hold of MemberTabs inside this component
-  member: Member | undefined;
+  @ViewChild('memberTabs', {static: true}) memberTabs?: TabsetComponent; // To get hold of MemberTabs inside this component
+  // assigned Empty member here to avoid errors in HTML as we removed  *ngIf="member" from the top div there. 
+  //That had to be removed because we made the Child (memberTabs) static above to be accessible onInit 
+  member: Member = {} as Member; 
   images: GalleryItem[] = [];
   activeTab?: TabDirective;
   messages: Message[] = [];
@@ -27,7 +29,20 @@ export class MemberDetailComponent implements OnInit{
   constructor(private memberService: MembersService, private route: ActivatedRoute, private messageService: MessageService) {
   }
   ngOnInit(): void {
-    this.loadmember();
+    // Get Member from Route Resolver (to read the querystring and open the respective Tab in query string)
+    this.route.data.subscribe({
+      next: data => {
+        this.member = data['member'] // the data[] attribute value 'member' must macth the resolve property name defined in app-routing.module.ts file.
+      }
+    })
+
+    this.route.queryParams.subscribe({
+      next: params => {
+        params['tab'] && this.selectTab(params['tab'])
+      }
+    })
+
+    this.getimages()
   }
 
   onTabActivated(data: TabDirective){
@@ -35,7 +50,12 @@ export class MemberDetailComponent implements OnInit{
     if(this.activeTab.heading === data.heading){
       this.loadMessages();
     }
+  }
 
+  selectTab(heading: string){
+    if(this.memberTabs){
+      this.memberTabs.tabs.find(t => t.heading === heading)!.active = true;
+    }
   }
 
   loadMessages(){
@@ -43,22 +63,6 @@ export class MemberDetailComponent implements OnInit{
       this.messageService.getMessageThread(this.member.userName).subscribe({
         next: messages => this.messages = messages
       })
-  }
-
-  loadmember()
-  {
-    const username = this.route.snapshot.paramMap.get('username');
-
-    if(!username)
-      return;
-
-    this.memberService.getMember(username).subscribe({
-      next: member => {
-        this.member = member,
-        this.getimages()
-      }
-    })
-
   }
 
   getimages() {

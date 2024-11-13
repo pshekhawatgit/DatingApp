@@ -42,6 +42,7 @@
                 routerLink="{{container === 'Outbox' ? 
                 '/members/' + message.recipientUserName 
                 : '/members/' + message.senderUserName}}"
+                [queryParams]="{tab: 'Messages'}"
             >
                 <td>{{message.content}}</td>
                 <td>
