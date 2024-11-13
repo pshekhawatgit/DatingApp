@@ -14,6 +14,7 @@ export class MessagesComponent {
   pageNumber = 1;
   pageSize = 5;
   container = 'Unread';
+  loading: boolean = false;
   
   constructor(private messageService: MessageService){}
 
@@ -22,11 +23,13 @@ export class MessagesComponent {
   }
 
   loadMessages(){
+    this.loading = true;
     this.messageService.getMessages(this.pageNumber, this.pageSize, this.container).subscribe({
       next : response => {
         // Set local Messages with the result from response
         this.messages = response.result;
         this.pagination = response.pagination;
+        this.loading = false;
       } 
     })
   }
