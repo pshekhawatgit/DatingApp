@@ -3,6 +3,7 @@ using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API;
@@ -33,6 +34,12 @@ public static class IdentityServiceExtensions
                 };
             });
 
-            return services;
-    } 
+        // Authorization is done only after Authentication
+        services.AddAuthorization(options => 
+        {
+            options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
+        });
+        return services;
+    }
 }
