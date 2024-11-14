@@ -3,16 +3,17 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Unicode;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
 public class Seed
 {
-    public static async Task SeedUsers(DataContext context)
+    public static async Task SeedUsers(UserManager<AppUser> userManager)
     {
         // Return if there are any Users already in DB
-        if(await context.Users.AnyAsync())
+        if(await userManager.Users.AnyAsync())
             return;
 
         // Read all content in a String from User Data file
@@ -27,9 +28,7 @@ public class Seed
         {
             user.UserName = user.UserName.ToLower();
 
-            context.Users.Add(user);
+            await userManager.CreateAsync(user, "Pa$$w0rd");
         }
-        // Save all users to Database
-        await context.SaveChangesAsync();
     }
 }
