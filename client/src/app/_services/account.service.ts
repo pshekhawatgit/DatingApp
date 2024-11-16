@@ -39,6 +39,14 @@ export class AccountService {
   // To be used from Component to set the User info in account service
   setCurrentUser(user: User)
   {
+    // set user roles an an empty array to fill in the role(s) later
+    user.roles = [];
+    // Decode user token. The name of the property which contains role(s) information in token is "role"
+    const roles = this.getDecodedToken(user.token).role;
+
+    // Set user roles. If it is one role then it is just a string, if multiple roles then its a string array
+    Array.isArray(roles) ? user.roles = roles : user.roles.push(roles);
+
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUserSource.next(user);
   }
@@ -46,5 +54,10 @@ export class AccountService {
   logout(){
     localStorage.removeItem('user')
     this.currentUserSource.next(null);
+  }
+
+  getDecodedToken(token: string){
+    // Get the part (2nd part) of the JSON Token which has Username and Role(s) Information 
+    return JSON.parse(atob(token.split('.')[1]));
   }
 }
