@@ -17,6 +17,9 @@ public class PresenceHub : Hub
     // Override the HUB method, When a user connects to HUB
     public override async Task OnConnectedAsync()
     {
+        if(Context.User == null)
+            throw new HubException("Cannot get current user claim");
+
         await _tracker.UserConnected(Context.User.GetUsername(), Context.ConnectionId);
 
         // invoke methods on Clients connected to this HUB
@@ -30,6 +33,9 @@ public class PresenceHub : Hub
     //  Override the HUB method, When a user disconnects from HUB
     public override async Task OnDisconnectedAsync(Exception exception)
     {
+        if(Context.User == null)
+            throw new HubException("Cannot get current user claim");
+            
         await _tracker.UserDisonnected(Context.User.GetUsername(), Context.ConnectionId);
 
         await Clients.Others.SendAsync("UserIsOffline", Context.User.GetUsername());
@@ -38,7 +44,7 @@ public class PresenceHub : Hub
         var currentUsers = await _tracker.GetOnlineUsers();
         // Notify all connected clients
         await Clients.All.SendAsync("GetOnlineUsers", currentUsers);
-        
+
         await base.OnDisconnectedAsync(exception);
     }
 }

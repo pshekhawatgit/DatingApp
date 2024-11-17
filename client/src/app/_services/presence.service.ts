@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
@@ -10,6 +10,7 @@ import { User } from '../_models/user';
 export class PresenceService {
   hubUrl = environment.hubUrl;
   private hubConnection?: HubConnection;
+  onlineUsers = signal<string[]>([]);
   
   constructor(private toastr: ToastrService) { }
 
@@ -25,11 +26,16 @@ export class PresenceService {
 
     this.hubConnection.on('UserIsOnline', username => {
       this.toastr.info(username + ' has connected')
-    })
+    });
 
     this.hubConnection.on('UserIsOffline', username => {
       this.toastr.warning(username + ' has disconnected')
-    })
+    });
+
+    // Check for or listen to the event we have created in API to get Online users
+    this.hubConnection.on('GetOnlineUsers', usernames => {
+      this.onlineUsers.set(usernames);
+    });
   }
 
   stopHubConnection(){
