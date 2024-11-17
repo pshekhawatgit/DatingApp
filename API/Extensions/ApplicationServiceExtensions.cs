@@ -26,6 +26,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<LogUserActivity>(); // Added Service to save LastActive datetime of a user 
         services.AddScoped<ILikesRepository, LikesRepository>(); // added to implement Likes functionality
         services.AddScoped<IMessageRepository, MessageRepository>(); // added to implement Messages functionality
+        services.AddSignalR();
 
         return services;
     }

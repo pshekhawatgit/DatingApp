@@ -3,6 +3,7 @@ using API.Data;
 using API.Entities;
 using API.Extensions;
 using API.Middleware;
+using API.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,6 +37,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+// For Implementing SignalR
+app.MapHub<PresenceHub>("hubs/presence");
 
 // Seed Data in DB for tests
 using var scope = app.Services.CreateScope();
