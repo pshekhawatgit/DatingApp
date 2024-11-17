@@ -43,6 +43,7 @@ app.UseAuthorization();
 app.MapControllers();
 // For Implementing SignalR
 app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
 
 // Seed Data in DB for tests
 using var scope = app.Services.CreateScope();
