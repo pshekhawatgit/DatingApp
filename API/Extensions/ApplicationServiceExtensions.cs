@@ -2,6 +2,7 @@
 using API.Helpers;
 using API.Interfaces;
 using API.Services;
+using API.SignalR;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +28,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ILikesRepository, LikesRepository>(); // added to implement Likes functionality
         services.AddScoped<IMessageRepository, MessageRepository>(); // added to implement Messages functionality
         services.AddSignalR();
+        services.AddSingleton<PresenceTracker>(); // Added as Singleton because we want this to be accessible to all the users connected to server, to show online presence
 
         return services;
     }
