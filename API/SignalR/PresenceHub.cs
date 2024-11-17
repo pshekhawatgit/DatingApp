@@ -1,9 +1,11 @@
 using System;
 using API.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace API.SignalR;
 
+[Authorize]
 public class PresenceHub : Hub
 {
     // Override the HUB method, When a user connects to HUB
