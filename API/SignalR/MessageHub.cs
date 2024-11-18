@@ -71,11 +71,10 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
             }
     }
 
-    private string GetGroupName(string caller, string? other)
+    private string GetGroupName(string caller, string other)
     {
         var stringCompare = string.CompareOrdinal(caller, other) < 0;
 
         return stringCompare ? $"{caller}-{other}" : $"{other}-{caller}";
     }
-
 }
