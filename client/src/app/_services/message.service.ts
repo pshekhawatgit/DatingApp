@@ -28,9 +28,13 @@ export class MessageService {
     // Start Hub Connection
     this.hubConnection.start().catch(error => console.log(error));
 
-    // ReceiveMessageThread is the name defined in ans sent from API's MessageHub
-    this.hubConnection.on('ReceiveMessageThread', messages => {
+    // ReceiveMessageThread is the name defined in and sent from API's MessageHub
+    this.hubConnection.on('RecieveMessageThread', messages => {
       this.messageThread.set(messages)
+    });
+    // NewMessage is the name defined in and sent from API's MessageHub
+    this.hubConnection.on("NewMessage", message => {
+      this.messageThread.update(messages => [...messages, message]) // This updates the existing messages[] with new message
     });
   }
 
@@ -55,9 +59,11 @@ export class MessageService {
     return this.http.get<Message[]>(this.baseUrl + 'messages/thread/'+ userName);
   }
 
-  sendMessage(username: string, content: string){
-    return this.http.post<Message>(this.baseUrl + 'messages', 
-      {recipientUsername: username, content});
+  async sendMessage(username: string, content: string){
+    // Rather than API controller, Invoke the SendMessage method from MessageHub on API side
+    // recipientUsername and content are the two properties of CreateMemberDTO, which "SendMessage" expects as input param
+    return this.hubConnection?.invoke('SendMessage', {recipientUsername: username, content})
+      .catch(error => console.log(error));
   }
 
   deleteMessage(messageid: number){
