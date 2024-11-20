@@ -5,6 +5,7 @@ import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
 import { HttpClient } from '@angular/common/http';
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { User } from '../_models/user';
+import { Group } from '../_models/group';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,23 @@ export class MessageService {
     this.hubConnection.on('RecieveMessageThread', messages => {
       this.messageThread.set(messages)
     });
+
+    // UpdatedGroup is the name defined in and sent from API's MessageHub whenever a connection is added to / removed from group
+    this.hubConnection.on('UpdatedGroup', (group: Group) => {
+      // If the otherusername (user to chat with) is in the group/chat
+      if(group.connections.some(c => c.username === otherUsername)) {
+        // Update dateread property of unread messages to now
+        const updatedMessages = this.messageThread().map(message => {
+          if(!message.dateRead){
+            return {...message, dateRead: new Date(Date.now())};
+          }
+          return message;
+        });
+        // Update message thread
+        this.messageThread.set(updatedMessages);
+      }
+    });
+    
     // NewMessage is the name defined in and sent from API's MessageHub
     this.hubConnection.on("NewMessage", message => {
       this.messageThread.update(messages => [...messages, message]) // This updates the existing messages[] with new message

@@ -5,6 +5,7 @@ using API.Extensions;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -27,19 +28,25 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
         // get groupname and add to groups
         var groupName = GetGroupName(Context.User.GetUsername(), otherUser);
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        await AddToGroup(groupName);
+        // Get group after adding to DB
+        var group = await AddToGroup(groupName);
+        // Send method to Client app (all connections connected to this groupname) with the updated group
+        await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
 
         // get message thread between these users
         var messages = await messageRepository.GetMessagesThread(Context.User.GetUsername(), otherUser);
 
-        // send group to clients
-        await Clients.Group(groupName).SendAsync("RecieveMessageThread", messages);
+        // send message thread to Caller
+        await Clients.Caller.SendAsync("RecieveMessageThread", messages);
     }
 
     //  Override the HUB method, When a user disconnects from HUB
     public override async Task OnDisconnectedAsync(Exception exception)
     {
-        await RemoveFromMessageGroup();
+        // Remove current connection from the message group
+        var group = await RemoveFromMessageGroup();
+        // Send method to client app (to all connections still connected to this groupname)
+        await Clients.Group(group.Name).SendAsync("UpdatedGroup");
         await base.OnDisconnectedAsync(exception);
     }
 
@@ -105,7 +112,7 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
         return stringCompare ? $"{caller}-{other}" : $"{other}-{caller}";
     }
 
-    private async Task<bool> AddToGroup(string groupName){
+    private async Task<Group> AddToGroup(string groupName){
         // Check if group already exists
         var group = await messageRepository.GetMessageGroup(groupName);
         // If not
@@ -119,16 +126,24 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
         var connection = new Connection(Context.ConnectionId, Context.User.GetUsername());
         group.connections.Add(connection);
         
-        return await messageRepository.SaveAllAsync();
+        if (await messageRepository.SaveAllAsync())
+            return group;
+
+        throw new HubException("Failed to add to group");
     }
 
-    private async Task RemoveFromMessageGroup()
+    private async Task<Group> RemoveFromMessageGroup()
     {
-        // Get connection
-        var connection = await messageRepository.GetConnection(Context.ConnectionId);
+        // Get message group, using current connection Id
+        var group = await messageRepository.GetGroupForConnection(Context.ConnectionId);
+        // Get connection from this group
+        var connection = group.connections.FirstOrDefault(c => c.ConnectionId == Context.ConnectionId);
         // Remove connection
         messageRepository.RemoveConnection(connection);
         // Save to DB
-        await messageRepository.SaveAllAsync();
+        if(await messageRepository.SaveAllAsync())
+            return group;
+
+        throw new HubException("Failed to remove from group"); 
     }
 }
