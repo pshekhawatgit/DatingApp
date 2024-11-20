@@ -29,6 +29,8 @@ import { HasRoleDirective } from './_directives/has-role.directive';
 import { UserManagementComponent } from './admin/user-management/user-management.component';
 import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
 import { RolesModalComponent } from './modals/role-modal/roles-modal.component';
+import { RouteReuseStrategy } from '@angular/router';
+import { CustomRouteReuseStrategy } from './_services/customRouteReuseStrategy';
 
 @NgModule({
   declarations: [
@@ -66,7 +68,8 @@ import { RolesModalComponent } from './modals/role-modal/roles-modal.component';
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }, // Multi was set to true bcuz we don't want to replace any Andgular default interceptors
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }, // Added to send JWT Authorization through interceptor
-    {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true} // Added to show Loading spinner in case of delays while loading
+    {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true}, // Added to show Loading spinner in case of delays while loading
+    {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy} // Added to implement custom route reuse, to direct user to another user message tab directly from notification
   ],
   bootstrap: [AppComponent]
 })
