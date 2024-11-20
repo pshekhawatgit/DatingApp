@@ -11,7 +11,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace API.SignalR;
 
 [Authorize]
-public class MessageHub(IMessageRepository messageRepository, IUserRepository userRepository, IMapper mapper) : Hub
+public class MessageHub(IMessageRepository messageRepository, IUserRepository userRepository
+    , IMapper mapper, IHubContext<PresenceHub> presenceHub) : Hub
 {
     // Override the HUB method, When a user connects to HUB
     public override async Task OnConnectedAsync()
@@ -74,6 +75,19 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
             if(group.connections.Any(x => x.Username == recipient.UserName))
             {
                 message.DateRead = DateTime.UtcNow;
+            }
+            else // to notify users not in Message group, but Online, if they are the recipient
+            {
+                // Get connections of the recipient user (a user could be connected from multiple devices)
+                var connections = await PresenceTracker.GetConnectionsForUser(recipient.UserName);
+                if(connections != null)
+                {
+                    // This information will be used in Client app
+                    await presenceHub.Clients.Clients(connections).SendAsync("NewMessageReceived", new {
+                        username = sender.UserName,
+                        knownAs = sender.KnownAs
+                    });
+                }
             }
 
             messageRepository.AddMessage(message);

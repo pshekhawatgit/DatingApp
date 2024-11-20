@@ -16,7 +16,6 @@ export class MemberCardComponent implements OnInit {
   private presenceService = inject(PresenceService);
   isOnline = computed(() => {
     const userName = this.member?.userName ?? ''; // provide an empty string as the fallback value if this.member?.userName is undefined
-    console.log('user is: ' + userName)
     return this.presenceService.onlineUsers().includes(userName);
   });
 
