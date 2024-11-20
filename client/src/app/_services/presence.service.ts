@@ -27,11 +27,13 @@ export class PresenceService {
     this.hubConnection.start().catch(error => console.log(error));
 
     this.hubConnection.on('UserIsOnline', username => {
-      this.toastr.info(username + ' has connected')
+      //this.toastr.info(username + ' has connected')
+      this.onlineUsers.set([...this.onlineUsers(), username]);
     });
 
     this.hubConnection.on('UserIsOffline', username => {
-      this.toastr.warning(username + ' has disconnected')
+      //this.toastr.warning(username + ' has disconnected')
+      this.onlineUsers.set(this.onlineUsers().filter(u => u !== username))
     });
 
     // Check for or listen to the event we have created in API to get Online users
