@@ -17,7 +17,8 @@ public static class ApplicationServiceExtensions
         services.AddCors();
         services.AddDbContext<DataContext>(opt => 
         {
-            opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
+            // opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
+            opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
         });
         services.AddScoped<ITokenService, TokenService>(); // Added custom built service to creating user tokens
         // services.AddScoped<IUserRepository, UserRepository>(); // Added to implement repository pattern, to inject repository layer in Controller Layer
