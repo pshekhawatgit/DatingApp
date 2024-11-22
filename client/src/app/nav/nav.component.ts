@@ -20,7 +20,10 @@ export class NavComponent {
 
   login() {
     this.accountService.login(this.model).subscribe({
-      next: _ => this.router.navigateByUrl('/members'), // Instead of _ you can also use ()
+      next: _ => {
+        this.router.navigateByUrl('/members');
+        this.model = {}; // this is to reset the form so that the browser doesn't remember the username/password in respective fields on logout
+      }, // Instead of _ you can also use ()
       error: error => this.toastr.error(error.error)
   })
   }
