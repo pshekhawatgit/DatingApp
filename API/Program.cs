@@ -40,6 +40,10 @@ app.UseCors(builder => builder
 app.UseAuthentication();
 app.UseAuthorization();
 
+// To serve Client files as static files from API
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
 // For Implementing SignalR
 app.MapHub<PresenceHub>("hubs/presence");
