@@ -85,16 +85,14 @@ public class MessageRepository : IMessageRepository
     public async Task<IEnumerable<MessageDto>> GetMessagesThread(string currentUserName, string recipientUserName)
     {
         // Get all messages b/w the current loggedin user and the selected user for thread
-        var messages = await _context.Messages
-            .Include(u => u.Sender).ThenInclude(s => s.Photos)
-            .Include(u => u.Recipient).ThenInclude(r => r.Photos)
+        var query = _context.Messages
             .Where(m => 
                 (m.SenderUserName == currentUserName && m.RecipientUserName == recipientUserName && m.SenderDeleted == false) 
                 || (m.RecipientUserName == currentUserName && m.SenderUserName == recipientUserName && m.RecipientDeleted == false))
             .OrderBy(m => m.MessageSent)
-            .ToListAsync();
+            .AsQueryable();
         // Get Unread messages
-        var unreadMessages = messages.Where(m => m.DateRead == null
+        var unreadMessages = query.Where(m => m.DateRead == null
             && m.RecipientUserName == currentUserName).ToList();
 
         // Set MessageRead Date for the unread messages
@@ -104,20 +102,14 @@ public class MessageRepository : IMessageRepository
             {
                 umessage.DateRead = DateTime.UtcNow;
             }
-
-            await _context.SaveChangesAsync();
         }
 
-        return _mapper.Map<IEnumerable<MessageDto>>(messages); 
+        // return _mapper.Map<IEnumerable<MessageDto>>(messages); 
+        return await query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
     public void RemoveConnection(Connection connection)
     {
         _context.Connections.Remove(connection);
-    }
-
-    public async Task<bool> SaveAllAsync()
-    {
-        return await _context.SaveChangesAsync() > 0;
     }
 }
