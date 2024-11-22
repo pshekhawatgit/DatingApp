@@ -48,6 +48,7 @@ app.MapControllers();
 // For Implementing SignalR
 app.MapHub<PresenceHub>("hubs/presence");
 app.MapHub<MessageHub>("hubs/message");
+app.MapFallbackToController("Index", "Fallback");
 
 // Seed Data in DB for tests
 using var scope = app.Services.CreateScope();
