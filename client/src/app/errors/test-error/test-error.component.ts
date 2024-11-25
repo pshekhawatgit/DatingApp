@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-test-error',
@@ -7,7 +8,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./test-error.component.css']
 })
 export class TestErrorComponent {
-  baseUrl = 'https://localhost:5001/api/';
+  baseUrl = environment.apiUrl; // replaced hardcoded localhost
   validationErrors: string[] = []; // Initialized to store Errors from validation as in Http response for validation error, we get an array 
   constructor(private http: HttpClient) {}
 

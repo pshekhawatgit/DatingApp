@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -10,6 +11,13 @@ namespace API.Data;
 
 public class Seed
 {
+    // Method to clear connections
+    public static async Task ClearConnections(DataContext context)
+    {
+        context.Connections.RemoveRange(context.Connections);
+        await context.SaveChangesAsync();
+    }
+
     public static async Task SeedUsers(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
     {
         // Return if there are any Users already in DB
@@ -41,6 +49,8 @@ public class Seed
         foreach(var user in users)
         {
             user.UserName = user.UserName.ToLower();
+            user.Created = DateTime.SpecifyKind(user.Created, DateTimeKind.Utc);
+            user.LastActive = DateTime.SpecifyKind(user.LastActive, DateTimeKind.Utc);
 
             await userManager.CreateAsync(user, "Pa$$w0rd");
             // map to a role
