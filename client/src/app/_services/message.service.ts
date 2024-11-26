@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Message } from '../_models/message';
 import { environment } from 'src/environments/environment';
 import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { User } from '../_models/user';
 import { Group } from '../_models/group';
+import { BusyService } from './busy.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +16,13 @@ export class MessageService {
   hubUrl = environment.hubUrl;
   private hubConnection?: HubConnection;
   messageThread = signal<Message[]>([]);
+  private busyService = inject(BusyService);
 
   constructor(private http: HttpClient) { }
 
   createHubConnection(user: User, otherUsername: string){
+    this.busyService.busy();
+
     this.hubConnection = new HubConnectionBuilder()
     .withUrl(this.hubUrl + 'message?user=' + otherUsername, { // "message" is the name we defined in API's program.cs
       accessTokenFactory: () => user.token
@@ -27,7 +31,9 @@ export class MessageService {
     .build();
 
     // Start Hub Connection
-    this.hubConnection.start().catch(error => console.log(error));
+    this.hubConnection.start()
+      .catch(error => console.log(error))
+      .finally(() => this.busyService.idle());
 
     // ReceiveMessageThread is the name defined in and sent from API's MessageHub
     this.hubConnection.on('RecieveMessageThread', messages => {

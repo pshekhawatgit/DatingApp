@@ -19,6 +19,7 @@ export class MemberMessagesComponent implements OnInit {
   @ViewChild('messageForm') messageForm?: NgForm // Added to access Message form so that it can be cleared once the message is sent
   messageContent = '';
   messageService = inject(MessageService);
+  loading = false;
 
   constructor(){
   }
@@ -27,11 +28,13 @@ export class MemberMessagesComponent implements OnInit {
   }
 
   sendMessage(){
+    this.loading = true;
+
     if(!this.username)
       return;
 
     this.messageService.sendMessage(this.username, this.messageContent).then(() => { 
       this.messageForm?.reset();
-    })
+    }).finally(() => this.loading = false);
   }
 }
