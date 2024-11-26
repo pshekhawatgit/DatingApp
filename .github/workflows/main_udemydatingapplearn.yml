@@ -27,7 +27,7 @@ jobs:
       - name: Install deps and build angular app
         run: |
           cd client
-          npm install
+          npm install --force
           ng build
       # Prady: End - Add to build Angular App
       - name: Set up .NET Core
